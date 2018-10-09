@@ -15,9 +15,9 @@
       <style>
       body {
   background: #16526B;
+  position: fixed;
   overflow: hidden;
-  width: 100vw;
-  height: 100vh;
+  margin: 0;
 }
 
 * {
@@ -159,6 +159,11 @@ label {
   
 
     <script >
+document.addEventListener('gesturestart', function (e) {
+    e.preventDefault();
+});
+
+
       let coords = document.querySelectorAll("input");
 
 if ("geolocation" in navigator)
