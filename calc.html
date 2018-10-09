@@ -159,39 +159,39 @@ label {
   
 
     <script >
-document.addEventListener('gesturestart', function (e) {
-    e.preventDefault();
-});
-
-
       let coords = document.querySelectorAll("input");
 
 if ("geolocation" in navigator)
   navigator.geolocation.getCurrentPosition(pos => {
     coords[0].value = pos.coords.latitude;
     coords[1].value = pos.coords.longitude;
-   let weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${ pos.coords.longitude}&appid=c1a619d2da95c16eca97e918280fe1c7`;
-    fetch(weatherURL).then(data => data.json()).then(data => {
+    let weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${ pos.coords.longitude}&appid=c1a619d2da95c16eca97e918280fe1c7`;
+
+    fetch(weatherURL).then(data => data.json()).then(data => {   
+      let url = `https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_global_mosaic/ImageServer/identify?geometry=${coords[1].value},${coords[0].value}&geometryType=esriGeometryPoint&returnGeometry=false&returnCatalogItems=false&f=json`;
+      
       coords[2].value = data.wind.speed;
-      calc(pos.coords.latitude,pos.coords.longitude,data.wind.speed)
+      
+      fetch(url).then(d => d.json()).then((d) => {
+        calc(pos.coords.latitude,pos.coords.longitude, data.wind.speed, d.value);
+      })
     });
   });
 else
-  console.log("GPS not available");
+  alert("Geolocation not available");
 
 
-function calc(lat = coords[0].value, long = coords[1].value, wind = coords[2].value, freeboard = coords[4].value) {
-  let url = `https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_global_mosaic/ImageServer/identify?geometry=${long},${lat}&geometryType=esriGeometryPoint&returnGeometry=false&returnCatalogItems=false&f=json`;
+function calc( lat = coords[0].value,
+               long = coords[1].value, wind = coords[2].value,
+               depth = coords[3].value,
+               freeboard = coords[4].value) {
+  
+  let windRatio = 5;
+  if (wind > 30) windRatio = 10;
+  else if (wind > 15) windRatio = 7;
 
-  fetch(url).then(data => data.json()).then((data) => {
-    let windRatio = 5;
-    console.log(wind)
-    if (wind > 30) windRatio = 10;
-    else if (wind > 15) windRatio = 7;
-    
-    coords[3].value = (data.value*3.28084 ).toFixed(2);
-    coords[5].value = (-Number(data.value) + Number(freeboard)) * windRatio;
-  });
+  coords[3].value = depth
+  coords[5].value = (-Number(depth) + Number(freeboard)) * windRatio + " feet";
 }
     </script>
 </body>
