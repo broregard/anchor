@@ -165,6 +165,43 @@ body {
   left: -5vw;
   top:37vh;
 }
+														    
+														    .rain:before {
+  content: "";
+  height: 15vh;
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  width: 45px;
+  border-left: 5px dashed white;
+  border-right: 5px dashed white;
+  animation:  rain .2s infinite linear alternate;
+}
+
+.rain:after {
+  content: "";
+  height: 15vh;
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  border-left: 5px dashed rgba(255,255,255,.2);
+  border-right: 5px dashed rgba(255,255,255,.2);
+  animation: rain .2s infinite linear alternate;
+}
+
+@keyframes rain {
+  0%{
+    border-left: 4px dashed rgba(255,255,255,.1);
+    border-right: 4px dashed rgba(255,255,255,.1);
+    width: 47px;
+  }
+  100% {
+    border-left: 5px dashed rgba(255,255,255,.05);
+    border-right: 5px dashed rgba(255,255,255,.05);
+    width: 45px;
+  }
+}
+
 
 
 
@@ -494,296 +531,300 @@ body {
 
   
 
-    <script >
-      var _slicedToArray = function () {function sliceIterator(arr, i) {var _arr = [];var _n = true;var _d = false;var _e = undefined;try {for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {_arr.push(_s.value);if (i && _arr.length === i) break;}} catch (err) {_d = true;_e = err;} finally {try {if (!_n && _i["return"]) _i["return"]();} finally {if (_d) throw _e;}}return _arr;}return function (arr, i) {if (Array.isArray(arr)) {return arr;} else if (Symbol.iterator in Object(arr)) {return sliceIterator(arr, i);} else {throw new TypeError("Invalid attempt to destructure non-iterable instance");}};}();var _createClass = function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};}();function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _possibleConstructorReturn(self, call) {if (!self) {throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return call && (typeof call === "object" || typeof call === "function") ? call : self;}function _inherits(subClass, superClass) {if (typeof superClass !== "function" && superClass !== null) {throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;}document.addEventListener('gesturestart', function (e) {
+    document.addEventListener('gesturestart', function (e) {
   e.preventDefault();
-});var
+});
 
 
-App = function (_React$Component) {_inherits(App, _React$Component);
-  function App(props) {_classCallCheck(this, App);var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this,
-    props));
-    _this.state = {
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       height: "",
       freeboard: 4,
       scope: 5,
       depth: 8,
       anchor: 60,
-      animationSpeed: 1 };
+      animationSpeed: 1
+    }
+    this.resizeWater = this.resizeWater.bind(this);
+    this.windowResize = this.windowResize.bind(this);
+    this.onScroll = this.onScroll.bind(this)
+  }
 
-    _this.resizeWater = _this.resizeWater.bind(_this);
-    _this.windowResize = _this.windowResize.bind(_this);
-    _this.onScroll = _this.onScroll.bind(_this);return _this;
-  }_createClass(App, [{ key: "componentDidMount", value: function componentDidMount()
+  componentDidMount(){
+    let windowHeight = window.innerHeight / 10 * 8
+    this.setState({height: windowHeight});
+    window.addEventListener("resize", this.windowResize);
+    window.addEventListener("orientationchange", this.windowResize);
+    window.addEventListener("scroll", this.onScroll);
+  }
 
-    {
-      var windowHeight = window.innerHeight / 10 * 8;
-      this.setState({ height: windowHeight });
-      window.addEventListener("resize", this.windowResize);
-      window.addEventListener("orientationchange", this.windowResize);
-      window.addEventListener("scroll", this.onScroll);
-    } }, { key: "componentWillUnmount", value: function componentWillUnmount()
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.windowResize);
+    window.removeEventListener("scroll", this.onScroll);
+    window.removeEventListener("orientationchange", this.windowResize);
+  }
 
-    {
-      window.removeEventListener("resize", this.windowResize);
-      window.removeEventListener("scroll", this.onScroll);
-      window.removeEventListener("orientationchange", this.windowResize);
-    } }, { key: "onScroll", value: function onScroll(
-
-    event) {
-      var width = event.nativeEvent.target.scrollWidth / 3;
-      var pos = event.nativeEvent.target.scrollLeft;
+  onScroll(event){
+    let width = event.nativeEvent.target.scrollWidth / 3;
+    let pos = event.nativeEvent.target.scrollLeft;
 
 
-      if (pos > width * 2 - width / 5) this.setState({ scope: 10, animationSpeed: 3 });else
-      if (pos > width - width / 5) this.setState({ scope: 7, animationSpeed: 2 });else
-      this.setState({ scope: 5, animationSpeed: 1 });
+    if (pos > width * 2 - width/5) this.setState({scope: 10, animationSpeed: 3});
+    else if (pos > width - width/5) this.setState({scope: 7, animationSpeed: 2});
+    else this.setState({scope: 5, animationSpeed: 1});
+    this.calculate();
+  }
+
+  windowResize(e) {
+    console.log("resize")
+    let windowHeight = window.innerHeight / 10;
+    let num = (this.state.depth - 8) / .5;
+    let ratio = windowHeight * 8 - windowHeight * 6;
+    let adjusted = windowHeight * 8  - num * (ratio/20);
+    this.setState({height: adjusted})
+    console.log(windowHeight*10, adjusted, this.state.height)
+  }
+
+  resizeWater(event) {
+    if (event.touches.length == 1) {
+      let touch = event.touches[0].pageY;
+      let [min,max] = this.getWindowSize();
+
+      this.setState({
+        height: Math.min(Math.max(touch, min), max)
+      });
+
+      this.setDepth();
       this.calculate();
-    } }, { key: "windowResize", value: function windowResize(
+    }
+  }
 
-    e) {
-      console.log("resize");
-      var windowHeight = window.innerHeight / 10;
-      var num = (this.state.depth - 8) / .5;
-      var ratio = windowHeight * 8 - windowHeight * 6;
-      var adjusted = windowHeight * 8 - num * (ratio / 20);
-      this.setState({ height: adjusted });
-      console.log(windowHeight * 10, adjusted, this.state.height);
-    } }, { key: "resizeWater", value: function resizeWater(
+  calculate() {
+    this.setState({
+      anchor: (this.state.freeboard + this.state.depth) * this.state.scope
+    });
+  }
 
-    event) {
-      if (event.touches.length == 1) {
-        var touch = event.touches[0].pageY;var _getWindowSize =
-        this.getWindowSize(),_getWindowSize2 = _slicedToArray(_getWindowSize, 2),min = _getWindowSize2[0],max = _getWindowSize2[1];
+  setDepth() {
+    let [min,max] = this.getWindowSize(); 
+    let adjustedDifference = -(min-max);
+    let ratio = adjustedDifference / 20;
+    adjustedDifference = -(this.state.height-max) / ratio *.5 + 8;
 
-        this.setState({
-          height: Math.min(Math.max(touch, min), max) });
+    this.setState({
+      depth: Math.floor(adjustedDifference)
+    });
+  }
 
+  getWindowSize() {
+    let windowHeight = window.innerHeight / 10;
+    return [windowHeight*6, windowHeight*8];  
+  }
 
-        this.setDepth();
-        this.calculate();
-      }
-    } }, { key: "calculate", value: function calculate()
+  render() {
+    return (
+      <div className="container" onScroll={this.onScroll}>
+        <Weather scope={this.state.scope}/>
 
-    {
-      this.setState({
-        anchor: (this.state.freeboard + this.state.depth) * this.state.scope });
+        <Water depth = {this.state.depth}
+          height = {this.state.height}
+          resizeWater = {this.resizeWater}
+          anchor = {this.state.anchor}
+          animationSpeed = {this.state.animationSpeed}
+          />
+        <CloudContainer animationSpeed={this.state.animationSpeed}/>
+      </div>
+    )
+  }
+}
 
-    } }, { key: "setDepth", value: function setDepth()
+class Water extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div className="water"
+        style={{top: this.props.height +"px"}}
+        onTouchMove={this.props.resizeWater}>
+        <DepthDisplay depth={this.props.depth}/>
+        <AnchorDisplay anchor={this.props.anchor}/>
+        <Boat animationSpeed={this.props.animationSpeed} />
+      </div>
+    )
+  }
+}
 
-    {var _getWindowSize3 =
-      this.getWindowSize(),_getWindowSize4 = _slicedToArray(_getWindowSize3, 2),min = _getWindowSize4[0],max = _getWindowSize4[1];
-      var adjustedDifference = -(min - max);
-      var ratio = adjustedDifference / 20;
-      adjustedDifference = -(this.state.height - max) / ratio * .5 + 8;
+class DepthDisplay extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div className="depthDisplay">
+        {this.props.depth}
+      </div>
+    )
+  }
+}
 
-      this.setState({
-        depth: Math.floor(adjustedDifference) });
+class AnchorDisplay extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div className="anchorDisplay">{this.props.anchor}</div>
+    )
+  }
+}
 
-    } }, { key: "getWindowSize", value: function getWindowSize()
+class Boat extends React.Component {
+  constructor(props) {
+    super(props);
 
-    {
-      var windowHeight = window.innerHeight / 10;
-      return [windowHeight * 6, windowHeight * 8];
-    } }, { key: "render", value: function render()
-
-    {
-      return (
-        React.createElement("div", { className: "container", onScroll: this.onScroll },
-          React.createElement(Weather, { scope: this.state.scope }),
-          React.createElement(CloudContainer, { animationSpeed: this.state.animationSpeed }),
-          React.createElement(Water, { depth: this.state.depth,
-            height: this.state.height,
-            resizeWater: this.resizeWater,
-            anchor: this.state.anchor,
-            animationSpeed: this.state.animationSpeed })));
-
-
-
-    } }]);return App;}(React.Component);var
-
-
-Water = function (_React$Component2) {_inherits(Water, _React$Component2);
-  function Water(props) {_classCallCheck(this, Water);return _possibleConstructorReturn(this, (Water.__proto__ || Object.getPrototypeOf(Water)).call(this,
-    props));
-  }_createClass(Water, [{ key: "render", value: function render()
-    {
-      return (
-        React.createElement("div", { className: "water",
-            style: { top: this.props.height + "px" },
-            onTouchMove: this.props.resizeWater },
-          React.createElement(DepthDisplay, { depth: this.props.depth }),
-          React.createElement(AnchorDisplay, { anchor: this.props.anchor }),
-          React.createElement(Boat, { animationSpeed: this.props.animationSpeed })));
-
-
-    } }]);return Water;}(React.Component);var
-
-
-DepthDisplay = function (_React$Component3) {_inherits(DepthDisplay, _React$Component3);
-  function DepthDisplay(props) {_classCallCheck(this, DepthDisplay);return _possibleConstructorReturn(this, (DepthDisplay.__proto__ || Object.getPrototypeOf(DepthDisplay)).call(this,
-    props));
-  }_createClass(DepthDisplay, [{ key: "render", value: function render()
-    {
-      return (
-        React.createElement("div", { className: "depthDisplay" },
-          this.props.depth));
-
-
-    } }]);return DepthDisplay;}(React.Component);var
-
-
-AnchorDisplay = function (_React$Component4) {_inherits(AnchorDisplay, _React$Component4);
-  function AnchorDisplay(props) {_classCallCheck(this, AnchorDisplay);return _possibleConstructorReturn(this, (AnchorDisplay.__proto__ || Object.getPrototypeOf(AnchorDisplay)).call(this,
-    props));
-  }_createClass(AnchorDisplay, [{ key: "render", value: function render()
-    {
-      return (
-        React.createElement("div", { className: "anchorDisplay" }, this.props.anchor));
-
-    } }]);return AnchorDisplay;}(React.Component);var
-
-
-Boat = function (_React$Component5) {_inherits(Boat, _React$Component5);
-  function Boat(props) {_classCallCheck(this, Boat);var _this5 = _possibleConstructorReturn(this, (Boat.__proto__ || Object.getPrototypeOf(Boat)).call(this,
-    props));
-
-    _this5.state = {
+    this.state = {
       y: 0,
       dir: 1,
-      lastFrame: +new Date() };
+      lastFrame: +new Date
+    }
+
+    this.interval = setInterval(() => {
+      let speed = this.props.animationSpeed;
+      if (speed == 1) speed = .15;
+      else if (speed == 2) speed = .25;
+      else speed = .35;
+
+      let now = +new Date;
+      let deltaT = now - this.state.lastFrame;
+      if (this.state.y > 6) this.setState({dir: -1});
+      else if (this.state.y < 1) this.setState({dir: 1});
+
+      let newState = this.state.y + (this.state.dir * speed)  * deltaT / 25;
+      this.setState({y: newState, lastFrame: now})
+    }, 25)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  render() {
+    let speed = this.props.animationSpeed;
+
+    if (speed == 1) speed = "3s";
+    else if (speed == 2) speed = "1s";
+    else speed = ".5s";
 
 
-    _this5.interval = setInterval(function () {
-      var speed = _this5.props.animationSpeed;
-      if (speed == 1) speed = .15;else
-      if (speed == 2) speed = .25;else
-      speed = .35;
+    return (
+      <div className="boat">
+        <div className="wrap">
+          <div className="main" style={{marginTop: this.state.y}}>
+            <div className="boat-top-layer">
+              <div className="top">
+                <div className="pole"></div>
+                <div className="help"><span></span></div>
+              </div>
+              <div className="bottom"></div>
+            </div>
+            <div className="boat-mid-layer">
+              <div className="top"></div>
+              <div className="bottom"></div>
+            </div>
+            <div className="boat-bot-layer">
+              <div className="top"></div>
+              <div className="bottom"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
 
-      var now = +new Date();
-      var deltaT = now - _this5.state.lastFrame;
-      if (_this5.state.y > 6) _this5.setState({ dir: -1 });else
-      if (_this5.state.y < 1) _this5.setState({ dir: 1 });
+class Weather extends React.Component {
+  constructor(props) {
+    super(props);
+  }
 
-      var newState = _this5.state.y + _this5.state.dir * speed * deltaT / 25;
-      _this5.setState({ y: newState, lastFrame: now });
-    }, 25);return _this5;
-  }_createClass(Boat, [{ key: "componentWillUnmount", value: function componentWillUnmount()
+  render() {
+    let str;
+    if (this.props.scope == "5") str = "Calm"
+    else if (this.props.scope == "7") str = "Windy"
+    else str = "Storm"
+    return (
+      <div>
 
-    {
-      clearInterval(this.interval);
-    } }, { key: "render", value: function render()
+        <div className="weather-container">
+          <div className="weather"></div>
+          <div className="weather"></div>
+          <div className="weather"></div>
+        </div>
+        <div className="weather-display">{str}</div>
+      </div>
+    )
+  }
+}
 
-    {
-      var speed = this.props.animationSpeed;
+class CloudContainer extends React.Component {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    let initClouds = [35, 85, -15]
+    let speed = this.props.animationSpeed;
 
-      if (speed == 1) speed = "3s";else
-      if (speed == 2) speed = "1s";else
-      speed = ".5s";
+    if (speed == 1) speed = 1;
+    else speed = 2.6;
 
+    initClouds = initClouds.map((cloud, index) => <Cloud init={cloud*window.innerWidth/100} animationSpeed={speed} rain={this.props.animationSpeed == 3 ? true: false}/>);
 
-      return (
-        React.createElement("div", { className: "boat" },
-          React.createElement("div", { className: "wrap" },
-            React.createElement("div", { className: "main", style: { marginTop: this.state.y } },
-              React.createElement("div", { className: "boat-top-layer" },
-                React.createElement("div", { className: "top" },
-                  React.createElement("div", { className: "pole" }),
-                  React.createElement("div", { className: "help" }, React.createElement("span", null))),
-
-                React.createElement("div", { className: "bottom" })),
-
-              React.createElement("div", { className: "boat-mid-layer" },
-                React.createElement("div", { className: "top" }),
-                React.createElement("div", { className: "bottom" })),
-
-              React.createElement("div", { className: "boat-bot-layer" },
-                React.createElement("div", { className: "top" }),
-                React.createElement("div", { className: "bottom" }))))));
-
-
-
-
-
-    } }]);return Boat;}(React.Component);var
-
-
-Weather = function (_React$Component6) {_inherits(Weather, _React$Component6);
-  function Weather(props) {_classCallCheck(this, Weather);return _possibleConstructorReturn(this, (Weather.__proto__ || Object.getPrototypeOf(Weather)).call(this,
-    props));
-  }_createClass(Weather, [{ key: "render", value: function render()
-
-    {
-      var str = void 0;
-      if (this.props.scope == "5") str = "Calm";else
-      if (this.props.scope == "7") str = "Windy";else
-      str = "Storm";
-      return (
-        React.createElement("div", null,
-
-          React.createElement("div", { className: "weather-container" },
-            React.createElement("div", { className: "weather" }),
-            React.createElement("div", { className: "weather" }),
-            React.createElement("div", { className: "weather" })),
-
-          React.createElement("div", { className: "weather-display" }, str)));
+                                return (
+                                <div className="cloud-container">
+                                  {initClouds}
+                                </div>
+                               )
+  }
+}
 
 
-    } }]);return Weather;}(React.Component);var
+class Cloud extends React.Component {
+  constructor(props) {
+    super(props)
 
+    this.state = {
+      x: this.props.init,
+      lastFrame: +new Date,
+      rand: (Math.random() * (3 - 1) + 1)/3
+    }
 
-CloudContainer = function (_React$Component7) {_inherits(CloudContainer, _React$Component7);
-  function CloudContainer(props) {_classCallCheck(this, CloudContainer);return _possibleConstructorReturn(this, (CloudContainer.__proto__ || Object.getPrototypeOf(CloudContainer)).call(this,
-    props));
-  }_createClass(CloudContainer, [{ key: "render", value: function render()
-    {
-      var initClouds = [15, 85, -5];
-      var speed = this.props.animationSpeed;
-      if (speed == 1) speed = 1;else
-      speed = 2.6;
-      initClouds = initClouds.map(function (cloud) {return React.createElement(Cloud, { init: cloud * window.innerWidth / 100, animationSpeed: speed });});
-      return (
-        React.createElement("div", { className: "cloud-container" },
-          initClouds));
+    this.interval = setInterval(() => {
+      let now = +new Date;
+      let deltaT = now - this.state.lastFrame;
+      if (this.state.x > window.innerWidth) this.setState({x: -300, rand: (Math.random() * (3 - 1) + 1)/3});
+      this.setState({x: this.state.x + this.props.animationSpeed * this.state.rand * deltaT / 25, lastFrame: now});
+    }, 25)
+  }
 
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
 
-    } }]);return CloudContainer;}(React.Component);var
-
-
-
-Cloud = function (_React$Component8) {_inherits(Cloud, _React$Component8);
-  function Cloud(props) {_classCallCheck(this, Cloud);var _this8 = _possibleConstructorReturn(this, (Cloud.__proto__ || Object.getPrototypeOf(Cloud)).call(this,
-    props));
-
-    _this8.state = {
-      x: _this8.props.init,
-      lastFrame: +new Date() };
-
-
-    _this8.interval = setInterval(function () {
-      var now = +new Date();
-      var deltaT = now - _this8.state.lastFrame;
-      if (_this8.state.x > window.innerWidth) _this8.setState({ x: -300 });
-      _this8.setState({ x: _this8.state.x + _this8.props.animationSpeed * deltaT / 25, lastFrame: now });
-    }, 25);return _this8;
-  }_createClass(Cloud, [{ key: "componentWillUnmount", value: function componentWillUnmount()
-
-    {
-      clearInterval(this.interval);
-    } }, { key: "render", value: function render()
-
-    {
-      var x = this.state.x + "px";
-      return (
-        React.createElement("div", { className: "cloud", style: { left: x } }));
-
-    } }]);return Cloud;}(React.Component);
+  render() {
+    let x = `${this.state.x}px`
+    let rain = <div className="rain"></div>;
+    return (
+      <div className="cloud" style={{left: x}}>{this.props.rain ? rain : false}</div>
+    )
+  }
+}
 
 
 
-
-ReactDOM.render(React.createElement(App, null), document.querySelector("#react"));
-    </script>
+ReactDOM.render(<App/>,document.querySelector("#react"));
 
 
 
