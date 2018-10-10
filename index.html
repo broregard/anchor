@@ -650,24 +650,23 @@ Boat = function (_React$Component5) {_inherits(Boat, _React$Component5);
 
     _this5.state = {
       y: 0,
-      dir: 1 };
+      dir: 1,
+      lastFrame: +new Date() };
 
 
     _this5.interval = setInterval(function () {
       var speed = _this5.props.animationSpeed;
-      if (speed == 1) speed = 1;else
-      if (speed = 2) speed = 1.8;else
-      speed = 2.1;
+      if (speed == 1) speed = .15;else
+      if (speed == 2) speed = .25;else
+      speed = .35;
 
+      var now = +new Date();
+      var deltaT = now - _this5.state.lastFrame;
       if (_this5.state.y > 6) _this5.setState({ dir: -1 });else
       if (_this5.state.y < 1) _this5.setState({ dir: 1 });
 
-      var eased = _this5.state.y + _this5.state.dir * .1 * speed;
-
-
-      _this5.setState({ y: eased });
-
-      //this.setState(() => ({y: this.state.y + 1}))
+      var newState = _this5.state.y + _this5.state.dir * speed * deltaT / 25;
+      _this5.setState({ y: newState, lastFrame: now });
     }, 25);return _this5;
   }_createClass(Boat, [{ key: "componentWillUnmount", value: function componentWillUnmount()
 
@@ -757,13 +756,16 @@ Cloud = function (_React$Component8) {_inherits(Cloud, _React$Component8);
     props));
 
     _this8.state = {
-      x: _this8.props.init };
+      x: _this8.props.init,
+      lastFrame: +new Date() };
 
 
     _this8.interval = setInterval(function () {
+      var now = +new Date();
+      var deltaT = now - _this8.state.lastFrame;
       if (_this8.state.x > window.innerWidth) _this8.setState({ x: -300 });
-      _this8.setState({ x: _this8.state.x + _this8.props.animationSpeed });
-    }, 30);return _this8;
+      _this8.setState({ x: _this8.state.x + _this8.props.animationSpeed * deltaT / 25, lastFrame: now });
+    }, 25);return _this8;
   }_createClass(Cloud, [{ key: "componentWillUnmount", value: function componentWillUnmount()
 
     {
