@@ -169,40 +169,29 @@ body {
   top:37vh;
 }
 
-.rain:before {
-  content: "";
+.cloud > div {
   height: 15vh;
+  overflow: hidden;
   position: absolute;
+
+  width: 100%;
   top: 40px;
-  right: 20px;
+}
+
+.cloud > div > .rain {
+  position: absolute;
+  height: 150%;
   width: 45px;
-  border-left: 5px dashed white;
-  border-right: 5px dashed white;
-  animation:  rain .2s infinite linear alternate;
+    border-left: 5px dashed rgba(255,255,255,.1);
+  border-right: 5px dashed rgba(255,255,255,.1);
 }
 
-.rain:after {
-  content: "";
-  height: 15vh;
-  position: absolute;
-  top: 40px;
+.cloud > div > .rain:nth-child(1) {
+  left: 120px;
+}
+
+.cloud > div > .rain:nth-child(2) {
   left: 20px;
-  border-left: 5px dashed rgba(255,255,255,.2);
-  border-right: 5px dashed rgba(255,255,255,.2);
-  animation: rain .2s infinite linear alternate;
-}
-
-@keyframes rain {
-  0%{
-    border-left: 4px dashed rgba(255,255,255,.1);
-    border-right: 4px dashed rgba(255,255,255,.1);
-    width: 47px;
-  }
-  100% {
-    border-left: 5px dashed rgba(255,255,255,.05);
-    border-right: 5px dashed rgba(255,255,255,.05);
-    width: 45px;
-  }
 }
 
 
@@ -525,7 +514,7 @@ body {
 
 <body translate="no" >
 
-  <div id="react"></div>
+  l<div id="react"></div>
   
   <script src='https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-dom.js'></script>
@@ -817,9 +806,9 @@ Cloud = function (_React$Component8) {_inherits(Cloud, _React$Component8);
 
     {
       var x = this.state.x + "px";
-      var rain = React.createElement("div", { className: "rain" });
+      var rain = React.createElement("div", null, React.createElement("div", { className: "rain" }), React.createElement("div", { className: "rain" }));
       return (
-        React.createElement("div", { className: "cloud", style: { left: x } }, this.props.rain ? false : false));
+        React.createElement("div", { className: "cloud", style: { left: x } }, this.props.rain ? rain : false));
 
     } }]);return Cloud;}(React.Component);
 
