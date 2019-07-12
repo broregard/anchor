@@ -136,7 +136,7 @@ if ("geolocation" in navigator)
     coords[1].value = pos.coords.longitude;
     let weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${ pos.coords.longitude}&appid=c1a619d2da95c16eca97e918280fe1c7`;
     fetch(weatherURL).then(data => data.json()).then(data => {   
-      let url = `https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_mosaics/DEM_global_mosaic/ImageServer/identify?geometry=${coords[1].value},${coords[0].value}&geometryType=esriGeometryPoint&returnGeometry=false&returnCatalogItems=false&f=json`;
+      let url = `https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_mosaics/DEM_global_mosaic/ImageServer/identify?geometry=${coords[0].value},${coords[1].value}&geometryType=esriGeometryPoint&returnGeometry=false&returnCatalogItems=false&f=json`;
       coords[2].value = data.wind.speed;
       
       fetch(url).then(d => d.json()).then((d) => {
