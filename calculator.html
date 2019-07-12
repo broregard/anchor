@@ -134,6 +134,8 @@ if ("geolocation" in navigator)
   navigator.geolocation.getCurrentPosition(pos => {
     coords[0].value = pos.coords.latitude;
     coords[1].value = pos.coords.longitude;
+                 
+                 alert(coords[0].value + " " + coords[1].value)
     let weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${ pos.coords.longitude}&appid=c1a619d2da95c16eca97e918280fe1c7`;
     fetch(weatherURL).then(data => data.json()).then(data => {   
       let url = `https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_mosaics/DEM_global_mosaic/ImageServer/identify?geometry=${coords[0].value},${coords[1].value}&geometryType=esriGeometryPoint&returnGeometry=false&returnCatalogItems=false&f=json`;
