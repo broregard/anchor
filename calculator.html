@@ -142,6 +142,7 @@ if ("geolocation" in navigator)
       coords[2].value = data.wind.speed;
       
       fetch(url).then(d => d.json()).then((d) => {
+                                            console.log(d);
         calc(pos.coords.latitude,pos.coords.longitude, data.wind.speed, Number(d.value)*-1);
       })
     });
